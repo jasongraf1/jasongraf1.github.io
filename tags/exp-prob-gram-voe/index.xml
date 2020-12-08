@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Exp-prob-gram-voe on Jason Grafmiller</title>
+    <link>/tags/exp-prob-gram-voe/</link>
+    <description>Recent content in Exp-prob-gram-voe on Jason Grafmiller</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Wed, 27 Apr 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/exp-prob-gram-voe/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Exploring probabilistic grammar(s) in varieties of English around the world</title>
+      <link>/project/exploring_prob_grammars/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>/project/exploring_prob_grammars/</guid>
+      <description>This is a multiyear (2013-2021) project funded by a Type II Odysseus grant awarded by the Research Foundation Flanders (FWO) to the Principal Investigator (grant # G0C5913N, budget: €856,260).
+Description of the Project The project is situated at the crossroads of research on English as a World Language, usage-based theoretical linguistics, variationist linguistics, and cognitive sociolinguistics. It specifically marries the spirit of the Probabilistic Grammar framework (which posits that grammatical knowledge is experience-based and partially probabilistic) to research along the lines of the English world-wide paradigm (which is concerned with the dialectology and sociolinguistics of post-colonial English-speaking communities around the world).</description>
+    </item>
+    
+  </channel>
+</rss>

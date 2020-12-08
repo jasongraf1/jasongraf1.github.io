@@ -1,0 +1,384 @@
+\documentclass[11pt,]{article}
+\usepackage[sc, osf]{mathpazo}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+
+
+
+
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% Now begins the stuff that I added.
+% ----------------------------------
+
+% Custom section fonts
+\usepackage{sectsty}
+\sectionfont{\rmfamily\mdseries\large\bf}
+\subsectionfont{\rmfamily\mdseries\normalsize\itshape}
+
+
+% Make lists without bullets
+%\renewenvironment{itemize}{
+%  \begin{list}{}{
+%    \setlength{\leftmargin}{1.5em}
+%  }
+%}{
+%  \end{list}
+%}
+
+
+% Make parskips rather than indent with lists.
+\usepackage{parskip}
+\usepackage{titlesec}
+\titlespacing\section{0pt}{12pt plus 4pt minus 2pt}{4pt plus 2pt minus 2pt}
+\titlespacing\subsection{0pt}{12pt plus 4pt minus 2pt}{4pt plus 2pt minus 2pt}
+
+% Use fontawesome. Note: you'll need TeXLive 2015. Update.
+\usepackage{fontawesome}
+
+% Fancyhdr, as I tend to do with these personal documents.
+\usepackage{fancyhdr,lastpage}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.0pt}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{
+\cfoot{\scriptsize  Jason Grafmiller - CV - orcid.org/0000-0002-9577-6885 }}
+\rfoot{\scriptsize \thepage/{\hypersetup{linkcolor=black}\pageref{LastPage}}}
+
+% Always load hyperref last.
+\usepackage{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+
+\hypersetup{unicode=true,
+            pdftitle={Jason Grafmiller:  CV (Curriculum Vitae)},
+            pdfauthor={Jason Grafmiller},
+            pdfkeywords={RMarkdown, academic CV, template},
+            colorlinks=true,
+            linkcolor=blue,
+            citecolor=Blue,
+            urlcolor=blue,
+            breaklinks=true, bookmarks=true}
+\urlstyle{same}  % don't use monospace font for urls
+
+\begin{document}
+
+
+\centerline{\huge \bf Jason Grafmiller}
+
+\vspace{2 mm}
+
+\hrule
+
+\vspace{2 mm}
+
+\moveleft.5\hoffset\centerline{Lecturer}
+\moveleft.5\hoffset\centerline{3 Elms Road · Birmingham · United Kingdom}
+\moveleft.5\hoffset\centerline{ \faEnvelopeO \hspace{1 mm} \href{mailto:}{\tt \href{mailto:j.grafmiller@bham.ac.uk}{\nolinkurl{j.grafmiller@bham.ac.uk}}} \hspace{1 mm}  \faPhone \hspace{1 mm}  +44 121 414 7017  \hspace{1 mm}  \faGithub \hspace{1 mm} \href{http://github.com/jasongraf1}{\tt jasongraf1} \hspace{1 mm}    \faGlobe \hspace{1 mm} \href{http://xxx}{\tt xxx}    | \emph{Updated:} \today}
+
+\vspace{2 mm}
+
+\hrule
+
+
+\section{EDUCATION}\label{education}
+
+\emph{Stanford University}, Ph.D.~Linguistics \hfill 2013\\
+\emph{The Ohio State University}, B.A. Linguistics \hfill 2006
+
+\section{EMPLOYMENT}\label{employment}
+
+\emph{English Language and Applied Linguistics, University of
+Birmingham}
+
+\begin{quote}
+Lecturer in Corpus-based Sociolinguistics \hfill 2017--present
+\end{quote}
+
+\emph{Quantitative Lexicology and Variational Linguistics, KU Leuven}
+
+\begin{quote}
+Post-doctoral fellow \hfill 2013--17
+\end{quote}
+
+\section{TEACHING}\label{teaching}
+
+\emph{Sounds, Structures and Words.} UG year 1 \hfill UBham 2017-2018
+
+\emph{Research Skills in English Language.} UG year 2 \hfill UBham
+2017-2018
+
+\emph{English as an International Language.} MA level \hfill UBham
+2017-2018
+
+\emph{Social and Psychological Aspects of Language.} MA level
+\hfill UBham 2017-2018
+
+\emph{Methods of Corpus Linguistics.} MA level \hfill KU Leuven
+2016-2017
+
+\begin{quote}
+Introduction to methods and techniques for dealing with the large
+collections of usage data found in linguistic corpora, and discussion of
+how these techniques contribute to linguistic theory development.
+Methods include: collocational/collostructional analysis, logistic
+regression, factor and correspondence analsys. MA level
+\end{quote}
+
+\emph{Introduction to modeling linguistic variation with R.} \hfill 2016
+
+\begin{quote}
+Invited workshop tutorial on variationist methods using R. University of
+Uppsala, Nov 1--2
+\end{quote}
+
+\emph{English Linguistics: Special Topics.} MA level \hfill KU Leuven
+2015
+
+\begin{quote}
+Seminar exploring the theoretical and empirical approaches to the study
+of argument realization in English, with special focus on English
+psychological verbs (``fear'', ``frighten''). In the course we consider
+what makes psych-verbs special as a class, and why (and in what ways)
+they challenge different theories of argument expression, event
+structure and the syntax-semantics interface.
+\end{quote}
+
+\emph{English Linguistics: Special Topics.} MA level \hfill KU Leuven
+2014
+
+\begin{quote}
+Seminar on the use of different methods for the study of syntactic
+variation within and across language varieties. We introduce basic
+concepts in variationist sociolinguistics and statistical tools, and
+discuss their application to the investigation of several grammatical
+phenomena in the recent literature.
+\end{quote}
+
+\emph{Quantitative Methods in Linguistics.} MA level \hfill Stanford
+2013
+
+\begin{quote}
+Introduction to methods for collecting and analyzing quantitative
+linguistic data, with a focus on the use of corpora in exploring
+theoretical questions in various area of linguistics. Topics will
+include the access and retrieval of corpus data, data annotation, and
+statistical modeling, using a variety of software tools (e.g.~Python,
+R).
+\end{quote}
+
+\subsection{As Teaching Assistant}\label{as-teaching-assistant}
+
+\emph{Introduction to Syntax (HPSG).} Stanford University. Instructor:
+Hanna Rohde
+
+\emph{Language in Society.} Stanford University. Instructor: Adam Hodges
+
+\emph{Introduction to Linguistics.} Stanford University. Instructors:
+Penny Eckert and Ivan Sag
+
+\section{PUBLICATIONS}\label{publications}
+
+\subsection{Journal articles}\label{journal-articles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2016}
+\item
+  Röthlisberger, Melanie, Jason Grafmiller \& Benedikt Szmrecsanyi.
+  Cognitive indigenization effects in the English dative alternation.
+  \emph{Cognitive Linguistics}. DOI: 10.1515/cog-2016-0051.
+\item
+  Szmrecsanyi, Benedikt, Jason Grafmiller, Joan Bresnan, Anette
+  Rosenbach, Sali Tagliamonte \& Simon Todd. Spoken syntax in a
+  comparative perspective: the dative and genitive alternation in
+  varieties of English. \emph{Glossa}. DOI: 10.5334/gjgl.310
+\item
+  Heller, Benedikt, Benedikt Szmrecsanyi \& Jason Grafmiller. Stability
+  and fluidity in syntactic variation world-wide: The genitive
+  alternation across varieties of English. \emph{Journal of English
+  Linguistics} 45(1). DOI: 10.1177/0075424216685405.
+\item
+  Grafmiller, Jason, Benedikt Szmrecsanyi \& Lars Hinrichs. Restricting
+  the restrictive relativizer: Constraints on subject and non-subject
+  English relative clauses. \emph{Corpus Linguistics and Linguistic
+  Theory}. DOI: 10.1515/cllt-2016-0015.
+\item
+  Szmrecsanyi, Benedikt, Jason Grafmiller, Benedikt Heller \& Melanie
+  Röthlisberger. Around the world in three alternations: Modeling
+  syntactic variation in global varieties of English. \emph{English
+  World Wide} 37(2). DOI: 10.1075/eww.37.2.01szm.
+\item
+  Grafmiller, Jason. Variation in English genitives across modality and
+  genres. \emph{English Language and Linguistics}, 18(3): 471-496. DOI:
+  10.1017/S1360674314000136.
+\end{enumerate}
+
+\subsection{Book chapters}\label{book-chapters}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2014}
+\item
+  Shih, Stephanie, Jason Grafmiller, Richard Futrell \& Joan Bresnan.
+  Rhythm's role in genitive and dative construction choice in English.
+  In R. Vogel and R. van de Vijver (eds) \emph{Rhythm in Phonetics,
+  Grammar, and Cognition}. De Gruyter, 207-234.
+\item
+  Levin, Beth \& Jason Grafmiller. Do you always fear what frightens
+  you? In T. H. King and V. de Paiva (eds) \emph{From Quirky Case to
+  Representing Space}. CSLI Publications, Stanford, 21-32.
+\end{enumerate}
+
+\section{PRESENTATIONS}\label{presentations}
+
+Grafmiller, Jason. 2016. Methods in Corpus-based Variationist
+Linguistics. Invited talk. University of Uppsala, Uppsala, Sweden. Oct
+31.
+
+Grafmiller, Jason. 2016. Reconsidering the locative syntax of
+experiencers in English. International Society for the Linguistics of
+English 4, Poznan, Poland, September 21.
+
+Grafmiller, Jason. 2016. Mapping out particle placement around the
+globe: A corpus study of indigenization patterns. International Society
+for the Linguistics of English 4, Poznan, Poland, September 19.
+
+Grafmiller, Jason, Benedikt Heller, Melanie R¨othlisberger \& Benedikt
+Szmrecsanyi. 2016. Syntactic variation and probabilistic indigenization
+in World Englishes. New Ways of Analyzing Syntactic Variation 2, Ghent,
+Belgium, May 19.
+
+Grafmiller, Jason, Benedikt Heller, Melanie R¨othlisberger \& Benedikt
+Szmrecsanyi. 2016. Syntactic variation as a measure of probabilistic
+indigenization in global varieties of English. The 90th Annual Meeting
+of the Linguistic Society of America, Washington D.C., January 10.
+
+Grafmiller, Jason \& Melanie R¨othlisberger. 2015. Syntactic
+alternations, schematization, and collostructional diversity in world
+Englishes. 21st conference of the International Association for World
+Englishes, Istanbul. October 9.
+
+Röthlisberger, Melanie, Jason Grafmiller, Benedikt Heller \& Benedikt
+Szmrecsanyi. 2015. What choice(s) do we have? Processing and contextual
+constraints on syntactic variation across the globe. 21st conference of
+the International Association for World Englishes, Istanbul. October 9.
+
+Grafmiller, Jason. 2015. Deviant diachrony: Exploring new methods for
+analyzing language change. New Developments in the Quantitative Study of
+Languages, Helsinki. August 29.
+
+Grafmiller, Jason. 2015. Transitivity and construal in English emotion
+verbs: A quantitative investigation. 13th International Cognitive
+Linguistics Conference, Newcastle. July 21.
+
+Grafmiller, Jason. 2015. On the ole of agency and causation in the
+semantics of emotion verbs: An empirical investigation. 23rd annual
+meeting of the European Society for Philosophy and Psychology, Tartu,
+Estonia. July 17.
+
+Szmrecsanyi, Benedikt, Jason Grafmiller, Melanie R¨othlisberger \&
+Benedikt Heller. 2015. Probabilistic variation in a comparative
+perspective: the grammar of varieties of English. ICLaVE 8, Leipzig. May
+27.
+
+Grafmiller, Jason. 2014. Modeling verb meanings: An experimental and
+corpusbased investigation of English emotion verbs. Invited talk.
+University of Bamberg, Bamberg, Germany. December 18.
+
+Grafmiller, Jason, Benedikt Heller, Melanie R¨othlisberger \& Benedikt
+Szmrecsanyi. 2014. Exploring probabilistic grammar(s) in Englishes
+around the world. ISLE 3, Zurich. August.
+
+Grafmiller, Jason, Benedikt Heller, Melanie R¨othlisberger \& Benedikt
+Szmrecsanyi. 2014. Exploring probabilistic grammar(s) in Englishes
+around the world. ICAME 35, Nottingham. May 1.
+
+Grafmiller, Jason. 2013. Modeling verb meaning with corpus data: A
+usage-based investigation of argument realization in English
+psych-verbs. American Association for Corpus Linguistics, San Diego, CA.
+January 18.
+
+Grafmiller, Jason. 2013. Object-Experiencer verbs as true transitive
+verbs. Poster at the 87th Annual Meeting of the Linguistic Society of
+America, Boston, MA. January 5.
+
+\textbf{2012. Grafmiller, Jason.} On the status of agentivity in
+Experiencer-object verbs. Agents and causes: Interdisciplinary aspects
+in mind, language and culture, Bielefeld, Germany. March 22.
+
+\textbf{2012. Grafmiller, Jason.} Agency is inferred in causal events:
+Evidence from ObjectExperiencer verbs. Poster at \emph{The 86th Annual
+Meeting of the Linguistic Society of America}, Portland, OR. January 6.
+
+\textbf{2011. Grafmiller, Jason \& Stephanie Shih.} New approaches to
+end weight. \emph{Variation and Typology: New Trends in Syntactic
+Research}, Helsinki. August 26.
+
+\textbf{2011. Grafmiller, Jason.} Non-structural influences on binding
+in Finnish possessives. \emph{The 85th Annual Meeting of the Linguistic
+Society of America}, Pittsburg, PA. January 7.
+
+\textbf{2011. Shih, Stephanie \& Jason Grafmiller.} Weighing in on end
+weight. \emph{The 85th Annual Meeting of the Linguistic Society of
+America}, Pittsburg, PA. January 9.
+
+\textbf{2010. Grafmiller, Jason \& Stephanie Shih.} Weighing in on end
+weight. \emph{The Development of Syntactic Alternations Workshop},
+Stanford University. November 12.
+
+\textbf{2009. Shih, Stephanie, Jason Grafmiller, Richard Futrell, \&
+Joan Bresnan.} Rhythm's role in genitive and dative construction choice
+in English. \emph{31st Annual Meeting of the Linguistic Association of
+Germany (DGfS)}, Osnabr"uck. March.
+
+\textbf{2008. Dmitrieva, Olga, Matthew Adams, Jason Grafmiller, Scott
+Grimm, Yuan Zhao, \& Arto Anttila.} Gradient OCP and harmonic alignment
+in English phonotactics. \emph{The 82nd Annual Meeting of the Linguistic
+Society of America}, Chicago, IL. January.
+
+\section{HONORS \& AWARDS}\label{honors-awards}
+
+\textbf{2011} First Runner-up, Student Abstract Award (``Weighing in on
+end weight'', with Stephanie Shih), 85th Linguistic Society of America
+meeting
+
+\textbf{2006} Best Undergraduate Research Paper in Linguistics
+(``Agreement Conflicts and Coordinate Nouns''). The Ohio State
+University
+
+\end{document}

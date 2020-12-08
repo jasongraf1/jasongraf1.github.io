@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Register-variation on Jason Grafmiller</title>
+    <link>/tags/register-variation/</link>
+    <description>Recent content in Register-variation on Jason Grafmiller</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Wed, 11 Apr 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/register-variation/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The register-specificity of probabilistic grammatical knowledge in English and Dutch</title>
+      <link>/project/register_variation/</link>
+      <pubDate>Wed, 11 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/project/register_variation/</guid>
+      <description>This is a multiyear (2018-2021) project funded by the Research Foundation Flanders (FWO) (grant # G0D4618N, budget: €229,000).
+Description of the Project Probabilistic grammars regulate the way in which we choose between different ways of saying the same thing. For example, in English people can say either Tom sent Mary a letter, or Tom sent a letter to Mary. Both syntactic variants have roughly the same meaning, and we know that variant choice is a function of precisely quantifiable effects of probabilistic factors such as the length of the theme, or the pronominality of the recipient.</description>
+    </item>
+    
+  </channel>
+</rss>

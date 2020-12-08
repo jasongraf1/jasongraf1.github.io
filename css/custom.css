@@ -1,0 +1,47 @@
+
+strong {
+	/* color: #97a5ac; gray */
+	/* #f994b8; pink */
+	/* color: #63caf6;  blue */
+	/* color: #e06c75; coral */
+}
+
+.pub-list-item {
+	font-size: .8rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+.fa {
+	/* color: #e06c75; coral */
+	color: #E39E21; /* for default theme */
+}
+
+.fa-li {
+	color: #E39E21;
+}
+
+.ai {
+	/* color: #e06c75; coral */
+	color: #E39E21; /* for default theme */
+}
+
+/* for buttons */
+.btn-primary.btn-outline {
+  color: #428C48 !important;
+  border-color: #428C48 !important;
+}
+
+.btn-primary.btn-outline:focus {
+  color: #428C48 !important;
+}
+
+.btn-primary.btn-outline:active {
+  color: #fff !important;
+}
+
+.btn-primary.btn-outline:hover {
+  background-color: #428C48 !important;
+}
