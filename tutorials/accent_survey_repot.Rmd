@@ -1,0 +1,649 @@
+---
+title: "Week 8 Accent Survey Report"
+subtitle: "English as an International Language"
+author: "Jason Grafmiller"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  bookdown::html_document2:
+    df_print: paged
+    highlight: tango
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+# NOTE: this is run with the `bookdown` package
+library(knitr)
+options(scipen = 7)
+opts_chunk$set(echo = T,
+  cache = F,
+  cache.path = "../cache/",
+	fig.path = "../figures/",
+	comment = NA,
+  warning = FALSE,
+	message = FALSE,
+	error = FALSE, 
+	eval = T,
+  echo = F,
+	digits = 2)
+```
+
+----------------------------------------
+
+```{r real_data, include = FALSE}
+# Find the most recent version (this will vary)
+files <- list.files(pattern = "English\\+accents.*")
+most_recent <- rev(sort(files))[1]
+
+survey_data0 <- read.csv(most_recent)
+```
+
+```{r plot_setup}
+library(tidyverse)
+
+# Adjust the theme a bit
+theme_set(theme_minimal())
+theme_update(
+  strip.text = element_text(color = "black", size = rel(1.2)),
+  panel.grid = element_line(color = "lightgrey"),
+  panel.grid.minor = element_blank(),
+  panel.border = element_rect(fill = NA, color = "darkgrey"),
+  plot.title = element_text(color = "black"),
+  plot.subtitle = element_text(color = "black"),
+  axis.text = element_text(color = "black")
+)
+```
+
+
+This is a short report on the accent survey from Qualtrics that I asked you to do for Week 8. The aim of this is to show you a little bit how you can analyse the output from Qualtrics to create nice graphs and tables in R for presentation.
+
+***Note on the software used here***
+
+Some familiarity with [**R**](https://www.r-project.org/) and [**RStudio**](https://rstudio.com/products/rstudio/) is necessary if you want to fully follow along. It will also help if you are familiar with a few of the core aspects of the "tidy" coding style, particularly the use of pipes, i.e. `%>%`. I've posted the full code in the [**R markdown file**](), which you can open in Rstudio.
+
+If you are new to R, I recommend the following to get started:
+
+- [**swiRl**](https://swirlstats.com/). This is a tutorial library that works directly in R. There really isn't a better way to learn R!
+- [***R for Data Science***](https://r4ds.had.co.nz/) by Hadley Wickham and Garrett Grolemund. This covers all the basics for working with R using the **"tidy"** approach to programming.
+- [***Text mining with R: a tidy approach***](https://www.tidytextmining.com/) by Julia Silge and David Robinson. This a great introduction to the `{tidytext}` package, which is a powerful tool for doing all kinds of things with text data, including tokenization, sentiment analysis and topic modelling.
+
+If you are not familiar with R, and you have no intention of ever using it, that's fine. Hopefully this will still be useful to see how you can present data regardless of what you use.
+
+# Preliminaries 
+
+*Feel free to skip this section if you just want to get to the results.*
+
+First we load the libraries into R.
+
+```{r libs, echo = T}
+# setup
+library(tidyverse) # for all kinds of manipulations
+library(patchwork) # for nice plotting
+library(kableExtra) # for nice tables
+```
+
+## Import the dataset
+
+Next we import the dataset into R as a data frame. I like to name my data objects transparently, in a way that helps me keep track of versions. `0` is always the original, unedited data frame. We don't want to alter this, so we'll create new data frames as we go. You certainly don't need to use R, but it is a very powerful tool if you do take the time to learn it. 
+
+```{r data, eval = F, echo = T}
+# "DATA_FILE" is whatever the name of the file is.
+survey_data0 <- read.csv("DATA_FILE")
+dim(survey_data0) # dimensions of the data farme
+```
+
+Let's see what the data frame looks like. You can also open it in Excel or OpenOffice or whatever software you normally use. 
+
+```{r echo = T}
+survey_data0
+```
+
+We can quickly see that the first two rows are not data, so we can find the number of participants by taking the number of rows in the data frame (`nrow()`) and subtracting 2.
+
+```{r echo=TRUE}
+n_participants <- nrow(survey_data0) - 2
+n_participants
+```
+Not a lot, but enough for our purposes here. 
+
+Before we start though, there is all that weird stuff in the first two rows that needs to be cleaned up. First of all, the second row in the data frame is not really needed for analysis, so we can get rid of that. We'll keep the first row for use later, as it contains some important information about the questions (click the little arrow on the right of the column headers to scroll trhough them).
+
+```{r echo=TRUE}
+survey_data1 <- survey_data0[-2,] # exclude row 2
+survey_data1
+```
+
+## Split the data frame
+
+Now recall that there were two tasks in the survey, as well as a bit of demographic information at the end. In addition to that, Qualtrics includes some metadata in the first few columns. We might want to break our data up into different data frames based on the tasks and types of information in the columns. There are 4 types here:
+
+- **Metadata**: Informaiton about the participant's activity, e.g. the date they took it, duration, progress. 
+- **Demographics**: Information supplied by participants about their background and personal history.
+- **Rating task answers**
+- **Labelling task answers**
+
+We'll create new data frames using the information in the `Question_ID` column to separate the different kinds of info. This si where knowledge of [**regular expressions**]() really comes in handy! ***NOTE:*** *I've set these values based on this specific survey as it was designed in Qualtrics. These will ONLY work for this survey. You will have to look at your own data and question IDs to see how to assign values.* In all cases, we'll make sure to keep the `ResponseId` column to track the participants.
+
+```{r echo = T}
+survey_metadata <- survey_data1 %>% 
+  select(!contains("Q")) # if column name does not contain 'Q' 
+
+survey_demographics <- survey_data1 %>% 
+  select(ResponseId, matches("Q[0-9]$")) # if column name has 'Q' followed by only one number
+
+survey_ratings <- survey_data1 %>% 
+  select(ResponseId, matches("Q.*_")) # if column name has 'Q' followed by a '_'
+
+survey_labels <- survey_data1 %>% 
+  select(ResponseId, matches("Q[0-9]{2}")) # if column name has 'Q' followed any two numbers
+```
+
+
+
+
+# Results: Ratings task
+
+We'll start with the ratings, which are a quantitative look at how people rate different accents according to a few traits. These can be arranged into nice plots and tables, and are (relatively) easy to interpret.
+
+Preparing the data takes a bit of work, and I've done some data wrangling behind the scenes to get things into a format the can be used efficiently. Again, you can check out the code in the [**R markdown file**]() if you want the details.
+
+```{r make_ratings_df}
+# Pull out the text of the question, which we'll ad as a column below
+ratings_question_text <- unlist(survey_ratings[1,])
+
+# Now create the 
+survey_ratings_long <- survey_ratings[-1,] %>% # exclude the first row
+  pivot_longer(
+    cols = -ResponseId, # pivot on the anonymous ID of the participant
+    names_to = "Question_ID",
+    values_to = "Value"
+    ) %>% 
+  mutate( # Now we add some more columns for useful information
+    Question_Text = rep(ratings_question_text[-1], n_participants), # exclude the ResponseId
+    Value_n = case_when( # numeric value for ratings
+      Value == "Strongly disagree" ~ 1,
+      Value == "Disagree" ~ 2,
+      Value == "Somewhat disagree" ~ 3,
+      Value == "Somewhat agree" ~ 4,
+      Value == "Agree" ~ 5,
+      Value == "Strongly agree" ~ 6
+    ),
+    Country = str_extract(Question_Text, "^[A-Z]{2}") %>% # country of the accent
+      as.factor(), 
+    Trait = str_extract(Question_Text, "\\w+$") %>% 
+      as.factor() # trait being rated
+  ) %>% 
+  left_join( # now add the demographic information
+    survey_demographics[-1,], # exclude the first row
+    by = "ResponseId"
+  ) %>% 
+  rename( # rename the demo columns just added
+    Age = "Q1",
+    Birth_country = "Q2",
+    Current_country = "Q3",
+    L1 = "Q4",
+    Other_Ls = "Q5",
+    Years_of_Eng = "Q6",
+    Eng_countries = "Q7"
+  )
+
+levels(survey_ratings_long$Country) <- c("Australia", "Brazil", "China", 
+  "Spain", "India", "Nigeria", "Singapore", "Sweden", "United Kingdom", "United States")
+```
+
+## Summary grpahs of ratings
+
+First we'll summarise the the ratings via some plots of means and standard deviations across the countries from which the speakers came and the traits that were evaluated. The first plot below (Figure \@ref(fig:ratingsSumm1)) breaks the ratings apart by country. One thing we might notice is that the UK, and US speakers tend to be rated higher than others on all traits, with the US speaker being perceived as less pleasant by some (hence the wider bar reflecting greater variance across participants).  
+
+```{r ratingsSumm1, fig.height=7, fig.width=8, fig.cap="Trait ratings for accents from ten countries. Ratings reflect the degree to which participants agree with the statement 'The speaker's accent is X'."}
+survey_ratings_long %>% 
+  group_by(Country, Trait) %>% 
+  summarise(
+    .groups = 'drop',
+    mean = mean(Value_n, na.rm = T),
+    SD = sd(Value_n, na.rm = T),
+    upper = ifelse(mean + SD > 6, 6, mean + SD),
+    lower = ifelse(mean - SD < 1, 1, mean - SD)
+  ) %>% 
+  ggplot(aes(Trait, mean)) +
+  geom_pointrange(aes(ymin = lower, ymax = upper), color = "#4daf4a") +
+  # geom_line(aes(group = ResponseId), alpha = .4, color = "white") +
+  # geom_point(alpha = .4, color = cols[1]) +
+  facet_wrap(~Country) +
+  coord_flip() +
+  scale_y_continuous(breaks = 1:6, limits = c(1,6)) +
+  theme(panel.grid.major.x = element_line(color = "lightgrey"),
+        panel.grid = element_blank()) +
+  labs(x = "", y = "(1 = Strongly disagree; 6 = Strongly agree)")
+```
+
+I think this pattern is even easier to see in Figure \@ref(fig:ratingsSumm2), which breaks things up by trait (it's always good to consider multiple ways of presenting data). Again, the UK accent speaker comes out slightly ahead of everyone else. This is not surprising, though as we noted in the seminar, it's not always clear how people interpret these labels. For example, what do particpants think 'correct' means here? 
+
+```{r ratingsSumm2, fig.height=6, fig.width=8, fig.cap="Trait ratings for accents from ten countries. Ratings reflect the degree to which participants agree with the statement 'The speaker's accent is X'."}
+ratingsSumm2 <- survey_ratings_long %>% 
+  group_by(Country, Trait) %>% 
+  summarise(
+    .groups = 'drop',
+    mean = mean(Value_n, na.rm = T),
+    SD = sd(Value_n, na.rm = T),
+    upper = ifelse(mean + SD > 6, 6, mean + SD),
+    lower = ifelse(mean - SD < 1, 1, mean - SD)
+  ) %>% 
+  ggplot(aes(Country, mean)) +
+  geom_pointrange(aes(ymin = lower, ymax = upper), color = "#984ea3") +
+  # geom_line(aes(group = ResponseId), alpha = .4, color = "white") +
+  # geom_point(alpha = .4, color = cols[1]) +
+  facet_wrap(~Trait) +
+  coord_flip() +
+  scale_y_continuous(limits = c(1,6), breaks = 1:6) +
+  theme(panel.grid.major.x = element_line(color = "lightgrey"),
+        panel.grid = element_blank()) +
+  labs(x = "", y = "(1 = Strongly disagree; 6 = Strongly agree)")
+
+ratingsSumm2
+```
+
+```{r eval = F}
+# You can save figures for using in Word documents or other written texts
+# If you use Windows (.docx, .pptx) I recommend saving as .emf files
+win.metafile("ratings2.emf")
+ratingsSumm2
+dev.off()
+
+# Or if you'd like a pdf
+pdf("ratings2.pdf", width = 7, height = 5)
+ratingsSumm2
+dev.off()
+```
+
+We could also explore the extent to which the participant's L1 affects their ratings. As it happens, we only have two L1s specified by participants, English and (Mandarin) Chinese.
+
+```{r L1plots, fig.height=7, fig.width=9, fig.cap="Trait ratings for accents from ten countries spearated by the participants' L1s. Ratings reflect the degree to which participants agree with the statement 'The speaker's accent is X'."}
+L1_cols <- c("#e41a1c","#377eb8")
+names(L1_cols) <- c("chinese", "english")
+  
+L1_fn <- function(df, L1){
+  df %>% 
+    group_by(Country, Trait) %>% 
+    summarise(
+      .groups = 'drop',
+      mean = mean(Value_n, na.rm = T),
+      SD = sd(Value_n, na.rm = T),
+      upper = ifelse(mean + SD > 6, 6, mean + SD),
+      lower = ifelse(mean - SD < 1, 1, mean - SD)
+    ) %>%
+    ggplot(aes(Country, mean)) +
+    geom_pointrange(aes(ymin = lower, ymax = upper), color = L1_cols[L1]) +
+    facet_wrap(~Trait) +
+    coord_flip() +
+    scale_y_continuous(limits = c(1,6), breaks = 1:6) +
+    theme(panel.grid.major.x = element_line(color = "lightgrey"),
+          panel.grid = element_blank()) +
+    labs(x = "", y = "(1 = Strongly disagree; 6 = Strongly agree)") +
+    ggtitle(paste("L1 =", toupper(L1)))
+}
+
+L1_df <- survey_ratings_long %>% 
+  mutate(
+    L1 = tolower(L1) %>% str_trim() %>% as.factor(),
+    L1 = fct_recode(L1, "chinese" = "mandarin")
+  ) %>% 
+  filter(L1 != "") %>%
+  droplevels() %>% 
+  nest_by(L1) %>% 
+  mutate(
+    plot = list(L1_fn(data, L1))
+  )
+
+L1_df$plot[[1]] + L1_df$plot[[2]]
+```
+
+
+
+So there looks like a bit of a difference between the English L1 participants and the Chinese L1 participants when it comes to rating accents. This is not surprising, and if we had more data, we could be a little bit more confident in these numbers.
+
+In terms of **acceptability**, English L1 raters found all the voices to be generally acceptable, while the Chinese L1 raters were more variable. In both groups the Inner Circle accents were rated quite high, while the Outer and Expanding cirlce accents tended to be rated lower, substantially so among Chinese L1 participants. We should be careful about making too much of these results, or attributing reasons for the differences we see. One explanation might be that English L1 participants, being more proficient and more comfortable with English in general, are simply more comfortable with different accents, and therefore more accepting. It could also be that lower acceptability of Outer/Expanding Circle accents among the Chinese L1 participants reflects attitudes shaped by experience learning English in more formal settings, where Inner Circle accents are treated as the standard. Whatever the true cause may be, it's important to bear in mind that as researchers, we don't really know *how* participants interpreted the label "acceptable". We would need to do some follow-up interviews perhaps to get a better sense of what participants were thinking in this task.  
+
+A similar Inner vs. Outer/Expanding Circle pattern emerged in the ratings for **correctness**, where Inner Circle accents tended to be rated higher than other accents. This is particularly clear in the English L1 group, which was more consistent with Outer/Expanding Circle accents than with the Inner Circle ones (though there are only 2 participants here). There is a clear correlation among ratings for **acceptability** and **correctness** for both L1 groups, which suggests that participants were appealing to similar concepts in these cases. We might wonder then, how participants viewed the labels "acceptable" vs. "correct", and whether these really are distinct concepts in people's thinking about language.
+
+**Familiarity** ratings relfected the expected patterns, with the UK and US accents rated the highest, and the Outer/Expanding circle ones less so. This is not at all surprising. Both L1 groups showed very similar patterns, which are likely due to the varying amount of exposure from different accents around the world. Even L1 speakers from the Inner Circle are not necessarily exposed to English accents from Outer, and especially Expanding Circle countries.
+
+Lastly, there is **pleasantness**, which perhaps the most subjective trait here. There is certainly more variability within the L1 groups, but not as much across groups. Both groups find the Inner Circle accents generally more pleasant on average than the others, and there is considerable disagreement in some cases, e.g. the Nigerian and Indian speakers. The US speaker is also rather polarising among the English L1 group. Apparently one participant did not like this speaker's voice and/or accent.
+
+
+## Summary tables of ratings
+
+The results can also be summarised in a table like in Table \@ref(tab:sumTab). Here I include the mean value, along with the standard deviation (SD) in brackets. Again, it's easy to see that the UK speaker had the highest average across all traits, and it had the highest rates of agreement among participants, as indicated by the low SDs (lower SD means less variation, i.e. greater agreement).
+
+```{r sumTab}
+L1_fn2 <- function(df, L1){
+  df %>% 
+    group_by(Country, Trait) %>% 
+    summarise(
+      .groups = 'drop',
+      mean = mean(Value_n, na.rm = T),
+      SD = sd(Value_n, na.rm = T),
+      upper = ifelse(mean + SD > 6, 6, mean + SD),
+      lower = ifelse(mean - SD < 1, 1, mean - SD),
+      mean_SD = paste0(round(mean, 1), " (", round(SD,1), ")")
+    ) %>% 
+    pivot_wider(
+      id_cols = c(Country, Trait),
+      names_from = Trait,
+      values_from = mean_SD) %>% 
+    arrange(desc(acceptable)) %>% 
+    kbl(caption = paste("Average ratings (with Standard Deviations) for each trait by country from L1", toupper(L1), "participants")) %>%
+    kable_minimal()
+}
+
+L1_df2 <- survey_ratings_long %>% 
+  mutate(
+    L1 = tolower(L1) %>% str_trim() %>% as.factor(),
+    L1 = fct_recode(L1, "chinese" = "mandarin")
+  ) %>% 
+  filter(L1 != "") %>%
+  droplevels() %>% 
+  nest_by(L1) %>% 
+  mutate(
+    plot = list(L1_fn2(data, L1))
+  )
+```
+
+```{r}
+L1_df2$plot[[1]] 
+```
+
+
+```{r}
+L1_df2$plot[[2]] 
+```
+
+<br> 
+
+We could also explore the correlations between how countries ranked on each of these traits. This gives us an idea of whether the ratings for the traits might be related to one another. Correlations scores range from -1 to 1, and 0 means there is no correlation at all. If it helps, you can see the difference in Figure \@ref(fig:cors).
+
+```{r cors, fig.height=3, fig.width=8, fig.cap="Illustrations of correlation ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation)."}
+p1 <- data.frame(x = rnorm(40)) %>% 
+  mutate(y = -x) %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  ggtitle("Correlation = -1")
+
+p2 <- MASS::mvrnorm(n=40, mu=c(1, .8), Sigma=matrix(c(1, 0, 0, 1), nrow=2), empirical=TRUE) %>% 
+  as.data.frame() %>% 
+  rename(x = "V1", y = "V2") %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  ggtitle("Correlation = 0")
+
+p3 <- data.frame(x = rnorm(40)) %>% 
+  mutate(y = x) %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  ggtitle("Correlation = 1")
+
+p1+p2+p3
+```
+
+I'll use Spearman's correlation coefficient \rho , which is better suited for correlating rankings, as we want to do here. It is clear that the ratings for all these traits are very highly correlated with one another (scores above .9 are extremely high). That is, the country rankings tend to be very similar no matter which trait we look at. We might note that acceptability and familiarity are almost perfectly correlated, which makes sense, but it also suggests that if we want to promote greater acceptance and tolerance towards other accents, increasing exposure might be one place to start.  
+
+```{r corTab}
+cor_df <- survey_ratings_long %>% 
+  group_by(Country, Trait) %>% 
+  summarise(
+    .groups = 'drop',
+    mean = mean(Value_n, na.rm = T),
+    SD = sd(Value_n, na.rm = T),
+    upper = ifelse(mean + SD > 6, 6, mean + SD),
+    lower = ifelse(mean - SD < 1, 1, mean - SD)
+  ) %>% 
+  pivot_wider(
+    id_cols = c(Country, Trait),
+    names_from = Trait,
+    values_from = mean) %>%
+  select(-1) %>% 
+  cor(method = "spearman") %>% 
+  round(3)
+
+# Now blank out the upper portion
+upper <- cor_df
+upper[upper.tri(cor_df, diag = T)] <- ""
+upper <- as.data.frame(upper)
+upper %>% 
+  as.data.frame() %>% 
+  slice_tail(n = 3) %>% 
+  select(-4) %>% 
+  kbl(caption = "Pairwise rank correlations (Spearman's rho) reflecting the degree to which the ranking of country accents in one trait correlates with the ranking in another trait.") %>%
+  kable_minimal()
+```
+
+
+
+
+
+## Individual traits
+
+We can zoom in on individual traits. These plots show the frequencies of participants' ratings for each voice. I've broken them up into separate plots for each trait, and separate counts (bars) by participant L1. Ratings are on the horizontal axis, and the vertical axis shows the number of participants who gave each rating. This shows us exactly how the ratings are distributed. (With so few responses, these look a bit odd, I admit)
+
+I won't say much more about these, except to note that you can get a better idea of why the average values in the previous plots are so variable. This is due partly to the very low overall numbers of responses, e.g. only 2 English L1 participants. With low numbers like this, particular individuals can have a big impact on the averages, as we can see in the US accent ratings for *pleasant* (Figure \@ref(fig:pleasant)), where one of the English L1 participants really didn't like the American speaker's voice. Also, consider the Singapore speaker, for whom each of the Chinese L1 participants gave a different rating. Whether these differences were an issue with the individual speakers or with the accents in general, it's impossible to say. But this kind of thing happens all the time with survey data, which is why it's important to design the survey well, and carefully examine your results in different ways.   
+
+```{r}
+# Define the plot function
+bar_plot_fn <- function(df, x, label){
+  df %>% 
+    group_by({{x}}, L1, Country) %>% 
+    count() %>% 
+    ggplot(aes(x = {{x}}, y = n)) +
+    geom_col(aes(fill = L1), position = position_dodge2(width = 0.9, preserve = "single")) +
+    facet_wrap(~ Country, ncol = 3) +
+    labs(
+      x = "", 
+      y = "Number of responses", 
+      title = paste("The speaker's accent is", toupper(label)),
+      subtitle = "(1 = Strongly disagree; 6 = Strongly agree)") +
+    scale_x_discrete(breaks = as.character(1:6), drop = F) +
+    scale_fill_manual(values = L1_cols) +
+    theme(panel.grid.major.x = element_line(color = "lightgrey"),
+          panel.grid.major.y = element_blank(),
+          axis.text.x = element_text(colour = "black"),
+          legend.position = "bottom") 
+}
+
+# Create plots by Trait
+ratings_plots <- survey_ratings_long %>% 
+  drop_na(Value_n) %>% 
+  mutate(
+    L1 = tolower(L1) %>% str_trim() %>% as.factor(),
+    L1 = fct_recode(L1, "chinese" = "mandarin")
+  ) %>% 
+  filter(L1 != "") %>%
+  droplevels() %>% 
+  mutate(Value_n = as.factor(Value_n)) %>% 
+  nest_by(Trait) %>% 
+  mutate(
+    plot = list(bar_plot_fn(data, Value_n, Trait))
+  )
+```
+
+```{r accept, fig.height=8, fig.width=8, fig.cap="Ratings for the degree to which participants agree with the statement 'The speaker's accent is acceptable'."}
+ratings_plots$plot[[1]]
+```
+<br>
+
+```{r correct, fig.height=8, fig.width=8, fig.cap="Ratings for the degree to which participants agree with the statement 'The speaker's accent is CORRECT'.", echo = F}
+ratings_plots$plot[[2]]
+```
+<br>
+
+```{r familiar, fig.height=8, fig.width=8, fig.cap="Ratings for the degree to which participants agree with the statement 'The speaker's accent is FAMILIAR'."}
+ratings_plots$plot[[3]] 
+```
+
+<br>
+ 
+```{r pleasant, fig.height=8, fig.width=8, fig.cap="Ratings for the degree to which participants agree with the statement 'The speaker's accent is PLEASANT'."}
+ratings_plots$plot[[4]]
+```
+
+I won't say much more about these, except to note that you can get a better idea of why the average values in the previous plots are so variable
+
+
+# Results: accent description task
+
+Now what about the description task? Remember that our data frame was a bit clunky, so I've done some further manipulation in R to get it into a format we can use. 
+
+As a reminder, here was the map provided in the survey:
+
+```{r map, fig.cap="The map from the questionnaire"}
+include_graphics("Picture2.png")
+```
+
+We'll look at the results of this task, where participants were asked to describe the accents of the countries indicated on the map above.
+
+```{r}
+survey_labels
+```
+
+```{r}
+# First, well convert this to a long format
+# Pull out the text of the question, which we'll ad as a column below
+label_question_text <- unlist(survey_labels[1,])
+
+# Now create the long format dataframe
+survey_labels_long <- survey_labels[-1,] %>% # exclude the first row
+  pivot_longer(
+    cols = -ResponseId, # pivot on the anonymous ID of the participant
+    names_to = "Question_ID",
+    values_to = "Value"
+    ) %>% 
+  mutate( # Now we add some more columns for useful information
+    Question_Text = rep(label_question_text[-1], n_participants)) %>% # exclude the ResponseId
+  left_join( # now add the demographic information
+    survey_demographics[-1,], # exclude the first row
+    by = "ResponseId"
+  ) %>% 
+  rename( # rename the demo columns just added
+    Age = "Q1",
+    Birth_country = "Q2",
+    Current_country = "Q3",
+    L1 = "Q4",
+    Other_Ls = "Q5",
+    Years_of_Eng = "Q6",
+    Eng_countries = "Q7"
+  )
+```
+
+
+```{r}
+table_fnc <- function(df, country){
+  df %>% 
+    select(Value, L1, Years_of_Eng) %>% # only look at select columns
+    rename(Description = "Value", `Participant L1` = "L1", `Years studying English` = "Years_of_Eng") %>% 
+    kbl(
+      label = paste("table", str_remove(country, "_"), sep = "-"),
+      caption = paste("Descriptions of the speaker from", toupper(country))) %>%
+    kable_minimal()
+}
+
+country_dfs <- survey_labels_long %>% 
+  dplyr::filter(str_detect(Question_Text, "Country")) %>% 
+  mutate(
+    Country = str_replace_all(Question_Text, "(\\w.*?\\(|\\))", ""),
+    Country = str_replace(Country, " ", "_")) %>% 
+  nest_by(Country) %>% 
+  mutate(
+    table = list(table_fnc(data, Country))
+  )
+```
+
+Again, I won't say much, since there's so little data to work with. But we can start by simply looking at the labels used. I'll go one accent at a time to help us see things more clearly. One thing to note is that many participants opted not to say anythign about some of these accents, which is not surprising given that some may be unfamiliar to them.
+
+I've created table that show the comments given by each participant, along with the participant's L1 and time spent using/studying English.
+
+
+## Inner Circle accents
+
+First we'll look at the Inner Circle countries, which were speakers E (UK), H (USA) and B (Australia).
+
+```{r}
+country_dfs$table[9][[1]]
+```
+
+
+```{r}
+country_dfs$table[10][[1]]
+```
+
+
+```{r}
+country_dfs$table[1][[1]]
+```
+
+Notice that there are a few different kinds of comments here, which we could sort into a number of possible categories. 
+
+- One set of comments seems to deal with notions of correctness, standardness and formality, e.g. "proper", "standard", and these particularly are used for the UK accent, though the comment "informal" was used for the US accent and the Australian accent was described as "colloquial". 
+- Other comments relate to linguistic qualities of the speech itself, e.g. "clarity", "high pitch", "nasal", "rhotic/oily" (that last coming from a Chinese participant who is likely drawing on attitudes and perceptions about rhoticity in Chinese dialects, e.g. Beijing). 
+- Then there are comments that seem to reflect affective or aesthetic judgements about the accent, e.g. "over-the-top", "strange", "I like the way they pronounce" 
+- There is one comment about intelligibility of the Australian accent, "can be a little bit hard to understand".
+- Finally there are comments that refer to characters or characteristic speakers, e.g. "gentleman" and "queen accent".
+
+With more data, we could look at how these categories were used by different groups of participants for the various kinds of accents.
+
+## Outer circle accents
+
+Now the Outer Circle countries, i.e. Singapore, Nigeria, and India. These are speakers I, G and J respectively. 
+
+```{r ic1}
+country_dfs$table[6][[1]]
+```
+
+```{r ic2}
+country_dfs$table[4][[1]]
+```
+
+
+```{r ic3}
+country_dfs$table[5][[1]]
+```
+
+We can again see some labels relating to aspects of linguistic structure, e.g. "filler particles", "plosive", and "high pitch" and "various intonation". There are also comments that are somewhere between linguistic descriptions and more aesthetic descriptions, e.g. "soft" and "bouncy". We also see some references to features of other languages, and some general comments about intelligibility.
+
+
+## Expanding circle accents
+
+Finally we have our speakers form the Expanding circle in Brazil, China, Sweden, and Spain (speakers F, D, C, and A). 
+
+```{r}
+country_dfs$table[2][[1]]
+```
+
+```{r}
+country_dfs$table[3][[1]]
+```
+
+
+```{r}
+country_dfs$table[7][[1]]
+```
+
+```{r}
+country_dfs$table[8][[1]]
+```
+
+Again we see comments related to linguistic features ("trilled r", "long vowel sounds"), intelligibility ("easy to understand", "difficult to understand", "clear"), and general affective qualities ("melodious", "harsh", "soft"). As with the other cases, we have to be careful about attributing these labels to the accents themselves, since these could be more about the speaker than the accent. 
+
+# Summary
+
+For the ratings task, we find a very high degree of correlation among the four traits measured overall. However, we do find small differences in the ratings between participants whose L1 is English, and those whose L1 is not English (all Chinese in this case). The English L1 group tended to rate all speakers high on acceptability and correctness, while the Chinese L1 group tended to rate Outer/Expanding Circle speaker lower on these traits. Familiarity was much more consistent across L1 groups, as expected, with US and UK speakers scoring highest, and Expanding circle speakers (Brazil, Spain) scoring the lowest. Pleasantness was more variable within groups, though the average scores were more consistent *between* L1 groups. Both tended to rate certain Inner Circle (and Singapore) speakers more pleasant than others.    
+
+A couple words of caution are needed, however. For one, we can't be sure how participants interpreted the labels given, and the evidence suggests that there is (possibly considerable) overlap in the ways people think about these labels and apply them to language. Another problem, which we discussed it the seminar, is that we can't be sure whether participants are appealing to properties of accents, or to properties of the individual speakers' voices. Including multiple examples of the accents might be one way to improve this kind of task, and allow us to make more reliable generalisations about the accents.  
+
+For the description task, results were more mixed, and there are a number of potential concerns with ths kind of task. One thing about this task that we noted in the seminars is that it is actually a rather hard thing to do for many people. Coming up with descriptions of accents for different countries is not a typical thing to do, and people seem to have a hard time thinking of what to say. The open-endedness of the task has a kind of paralysing effect, where one isn't sure at all how to respond. 
+
+Another issue that came up was that the task may lead people to simply appeal to stereotypes, whether those stereotypes are ones they personally hold, or merely ones that they've heard expressed by others. It's also impossible to know just how familiar a given participant may be with the given accent, which of course raises questions abotu the validity of the responses. One way we might resolve this problem, and others, is by having participants listen to speech samples (like in the rating task) and then provide descriptions. This would of course introduce some of the same complications as the rating task, but it could provide clearer responses. In the end, some combination of fixed and open-ended questions or tasks is usually more informative than either on their own. 
+
+
+
